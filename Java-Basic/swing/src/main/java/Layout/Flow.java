@@ -6,7 +6,7 @@ import javax.swing.*;
 /**
  * reference: https://blog.csdn.net/xietansheng/article/details/72814541
  */
-public class FlowLayout {
+public class Flow {
     public static void main(String args[]) {
         JFrame jf = new JFrame("测试窗口");
         jf.setSize(200, 250);
@@ -14,8 +14,7 @@ public class FlowLayout {
         jf.setLocationRelativeTo(null);
 
         // 创建内容面板，默认即为流式布局
-        JPanel panel = new JPanel();
-
+        JPanel panel = new JPanel(new FlowLayout());
         panel.add(new JButton("按钮01"));
         panel.add(new JButton("按钮02"));
         panel.add(new JButton("按钮03"));
