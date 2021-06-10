@@ -8,6 +8,11 @@ import java.awt.*;
  */
 public class RadioButton {
     public static void main(String[] args) throws AWTException {
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+        }
         JFrame jf = new JFrame("测试窗口");
         jf.setSize(200, 200);
         jf.setLocationRelativeTo(null);

@@ -1,11 +1,17 @@
 package BasicModel;
 
 import javax.swing.*;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class Slider {
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException e) {
+        }
         JFrame jf = new JFrame("测试窗口");
         jf.setSize(250, 250);
         jf.setLocationRelativeTo(null);
