@@ -26,7 +26,7 @@ public class Label {
          * 只显示图片
          */
         JLabel label02 = new JLabel();
-        label02.setIcon(new ImageIcon("Java-Basic/swing/image/doge.jpg"));
+        label02.setIcon(new ImageIcon("Java-Basic/swing/resource/icons/doge.jpg"));
         panel.add(label02);
 
         /*
@@ -34,7 +34,7 @@ public class Label {
          */
         JLabel label03 = new JLabel();
         label03.setText("文本和图片");
-        label03.setIcon(new ImageIcon("Java-Basic/swing/image/doge.jpg"));
+        label03.setIcon(new ImageIcon("Java-Basic/swing/resource/icons/doge.jpg"));
         label03.setHorizontalTextPosition(SwingConstants.CENTER); // 水平方向文本在图片中心
         label03.setVerticalTextPosition(SwingConstants.BOTTOM); // 垂直方向文本在图片下方
         panel.add(label03);
