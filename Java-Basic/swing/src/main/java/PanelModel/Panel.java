@@ -1,4 +1,4 @@
-package Panel;
+package PanelModel;
 
 import javax.swing.*;
 import java.awt.*;
