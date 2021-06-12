@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * reference: https:// blog.csdn.net/xietansheng/article/details/74363221
+ * reference: https://blog.csdn.net/xietansheng/article/details/74363221
  */
 public class Button {
     public static void main(String[] args) {
