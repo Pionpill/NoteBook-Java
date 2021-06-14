@@ -3,7 +3,7 @@ package Layout;
 import javax.swing.*;
 
 /**
- * reference: https:// blog.csdn.net/xietansheng/article/details/72862722
+ * reference: https://blog.csdn.net/xietansheng/article/details/72862722
  */
 public class SpringLay {
     public static void main(String[] args) {

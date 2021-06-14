@@ -5,7 +5,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * reference:https:// blog.csdn.net/xietansheng/article/details/74363460
+ * reference:https://blog.csdn.net/xietansheng/article/details/74363460
  */
 
 public class CheckBox {
