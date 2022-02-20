@@ -1,0 +1,105 @@
+\section{接口，lambda表达式，内部类}
+\subsection{接口}
+\subsubsection{接口的概念}
+
+在 Java 程序设计语言中，接口不是类，而是对希望符合这个接口的类的一组需求。
+
+下面我们看一个 \texttt{Comparable} 接口\footnote{在旧版 Java 中，使用的是 Object 而不是泛型类型。虽然泛型类型要在之后说明，但现在已经很少用 Object 进行强制类型转换，泛型已经成为绝大多数程序员的首选。}。
+\begin{Java}
+public interface Comparable<T> {
+    int compareTo(T other);
+}
+\end{Java}
+这说明，任何实现该接口的类都必须包含 \texttt{compareTo} 方法，这个方法有一个泛型参数 \texttt{other}，并返回整数。
+
+接口中的所有方法都是 \texttt{public}。因此在接口中声明方法时，不必提供关键字 \texttt{public}。
+
+接口中不应该提供实例字段和实例方法(新版 Java 已经可以提供简单的实例方法)。这个任务应该交给实现接口的类来完成。
+
+为了让类实现一个接口，通常需要完成以下几步操作。
+\begin{enumerate}
+    \item 将类声明为实现给定的接口。
+\begin{Java}
+class Employee implements Comparable<Employee>
+\end{Java}
+    \item 对接口中的所有方法提供定义。
+\begin{Java}
+class Employee implements Comparable<Employee> {
+    public int compareTo(Employee other) {
+        return Double.compare(this.salary, other.salary);
+    }
+}
+\end{Java}
+\end{enumerate}
+
+\fbox{
+    \parbox{0.87\textwidth}{
+        \begin{warning}
+            在接口申明中可以省略 \texttt{public}。但是在实现接口时，必须把方法声明为 \texttt{public}，否则编译器会报错。
+        \end{warning}
+    }
+}
+
+既然接口只有一个方法，那么我们为什么不直接实现该方法，而要多一步实现接口的操作呢? 这主要有两个原因:
+\begin{itemize}
+    \item 一是在参数类型中我们可以书写接口类型，这样就能确保实参都实现了该接口。方便后续操作。
+    \item 二是 Java 是一种工程化语言，往往具有复杂的继承关系，实现接口方便项目管理。
+\end{itemize}
+
+\subsubsection{接口的属性}
+
+接口不是类，不能使用 \texttt{new} 运算符实例化一个接口。但能却能声明接口变量，接口变量必须引用实现了这个接口的类对象:
+\begin{Java}
+Comparable x = new Employee("Pionpill");
+\end{Java}
+
+接口在许多方面表现的都与类一样，比如接口变量可以使用 \texttt{instance} 检查，接口可以继承接口。接口中的成员有以下特点:
+\begin{itemize}
+    \item 成员方法: 声明时必须为 \texttt{public}，可以省略。实现时必须为 \texttt{public}，但不可以省略。
+    \item 成员属性: 接口中不能包含实例字段，但是可以包含常量。接口中的字段默认为 \texttt{public static final}。
+\end{itemize}
+
+既然现代的接口已经可以实现某些简单的方法，那么抽象类与接口的差别在哪呢。设计接口的最主要原因是 Java 只允许类的单继承，而类在实现接口时可以多继承:
+\begin{Java}
+class Employee implements Cloneable, Comparable
+\end{Java}
+
+\subsubsection{静态和私有方法}
+
+在 Java8 中，允许在接口中添加静态方法。理论上讲，这没有任何语法错误，但是这有悖于接口的初衷。目前为止，通常的做法是将静态方法放在伴随类中。在标准库中，经常会有成对出现的接口和实用工具类，如 \texttt{Collection/Collections}。
+
+随着 Java 的更新，在 Java11 标准库中已经将很多静态方法放在接口中，这样一来，这就没有必要再为实用工具方法另外提供一个伴随类。
+
+在 Java9 中，接口中的方法是可以为 \texttt{private} 的。既可以修饰静态方法也可以是实例方法。但作用十分有限。
+
+\subsubsection{默认方法}
+
+可以为接口方法提供一个默认实现。必须用 \texttt{default} 修饰符标记这样一个方法。
+
+\begin{Java}
+public interface Comparable<T> {
+    default int compareTo(T other) {
+        return 0
+    }
+}
+\end{Java}
+
+当然这并没有太大的用处，毕竟每一个实现接口的类都会覆盖里面的方法。
+
+不过某些情况下，这会有些用:
+\begin{itemize}
+    \item 接口演化问题: 如果随着接口更新，加入了新的方法，对应的实现类就会报错，这时候设置一个默认方法就可以避免这种错误。
+    \item 默认方法可以调用其他方法，这可以简化一些操作。
+\end{itemize}
+
+既然接口可以多继承，那必然会导致同名方法冲突，幸运的是，Java 解决这类冲突的规则十分简单:
+\begin{itemize}
+    \item 超类优先。如果超类与接口具有同名方法，那么采取超类中实现的具体方法。
+    \item 接口冲突。如果两个接口提供了相同的默认方法，那么必须覆盖这个方法来解决冲突。
+\end{itemize}
+
+多继承带来的冲突远不止这些，但 Java 的解决思路大致如上，如果具体的实现类与接口冲突，则才需类中的方法，接口有没有提供默认方法并灭有什么区别。这正是 ``类优先'' 原则。
+
+\subsubsection{回调}
+
+回调简单来讲是指某一件事发生后进行调用。
