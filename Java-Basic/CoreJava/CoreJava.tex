@@ -1,0 +1,69 @@
+\documentclass{PionpillNote-book}
+\usetikzlibrary {intersections,through,arrows.meta,graphs,shapes.misc,positioning,shapes.misc,positioning,calc}
+\usetikzlibrary{animations}
+\usetikzlibrary {shapes.geometric}
+\usetikzlibrary {animations}
+\usetikzlibrary {shapes.multipart}
+\usetikzlibrary {positioning}
+\usetikzlibrary {fit,shapes.geometric}
+\usetikzlibrary {automata}
+\usetikzlibrary {quotes}
+\usetikzlibrary {matrix}
+\usetikzlibrary {backgrounds}
+\usetikzlibrary {scopes}
+\usetikzlibrary {calc}
+\usetikzlibrary {intersections}
+\usetikzlibrary {svg.path}
+\usetikzlibrary {decorations}
+\usetikzlibrary {patterns}
+\usetikzlibrary {decorations.pathmorphing}
+\usetikzlibrary {shadows}
+\usetikzlibrary {bending}
+
+\title{Java 核心技术 笔记}
+\author{
+    Pionpill \footnote{笔名：北岸，电子邮件：673486387@qq.com，Github：\url{https://github.com/Pionpill}} \\
+    本文档为作者学习《Java 核心技术》\footnote{《Core Java》:Cay S. Horstmann 原书第11版 2021第一版}一书时的笔记。\\
+}
+
+\date{\today}
+
+\begin{document}
+
+\pagestyle{plain}
+\maketitle
+
+\noindent\textbf{前言：}
+
+笔者为软件工程系在校本科生，有计算机学科理论基础(操作系统，数据结构，计算机网络，编译原理等)，本人在撰写此笔记时已经学过 C++/Python/JavaScript 等语言，且对 Java 语言有一定了解，过于基础的内容本人不会再介绍。
+
+本文文章结构与原书大体相同，分上下两卷。上卷基础部分，基础部分的基础内容不再赘述，下卷深入 Java 语言。但每卷结构都有修改。
+
+原文花费了大段篇幅书写 Java 一些跨时代的特性(相对之前的高级语言而言)，但这些特性中的绝大部分在现代程序设计语言中已是司空见惯的基本属性，因此，本人会按照自己的思维撰写笔记。
+
+本人的编写及开发环境如下：
+\begin{itemize}
+    \item IDE: VSCode 1.62
+    \item JDK11
+\end{itemize}
+
+\date{\today}
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\setcounter{page}{1} 
+\pagestyle{fancy}
+
+
+\import{Parts/Part-1/Chapter-1}{Section-1.tex}
+\import{Parts/Part-1/Chapter-1}{Section-2.tex}
+
+\import{Parts/Part-1/Chapter-2}{Section-1.tex}
+\import{Parts/Part-1/Chapter-2}{Section-2.tex}
+\import{Parts/Part-1/Chapter-2}{Section-3.tex}
+
+\end{document}
+

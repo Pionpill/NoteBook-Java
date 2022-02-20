@@ -1,0 +1,207 @@
+\chapter{面向对象}
+\section{对象与类}
+\subsection{包}
+\subsubsection{包名}
+
+使用包的主要原因是确保类名的唯一性。一般，为了确保包名的绝对唯一性，要用一个因特尔域名以逆序的形式作为包名，然后对于不同的工程使用不同的子包。
+
+从编译器的角度来看，嵌套的包之间没有任何关系。例如，\texttt{java.util} 与 \texttt{java.util.jar} 包毫无关系。每一个包都是独立的类集合。
+
+\subsubsection{类的导入}
+
+一个类可以使用所属包中的所有类，以及其他包中的公共类。
+
+可以使用两种方式访问另一个包中的公共类。第一种方式是使用完全限定名；就是包名后面跟着类名:
+
+\begin{Java}
+java.time.LocalDate today = java.time.LocalDate.now();
+\end{Java}
+
+这种方式很繁琐，更常见的是使用 \texttt{import} 语句引入:
+
+\begin{Java}
+import java.time.*;
+\end{Java}
+
+上面这种使用通配符导入所有类对代码的规模没有任何负面影响。不过如果能精确到类名，可以增加代码可读性。此外，* 可以导入目标包下的所有类，但是不能导入文件下的包。
+
+在极个别情况下，仍有可能出现类名冲突，这时候就只能使用完全限定名了:
+
+\begin{Java}
+import java.util.*;
+import java.sql.*;
+var deadline = new java.util.Date();
+var today = new java.sql.Date(...);
+\end{Java}
+
+此时也体现了 \texttt{var} 声明语句的好处：可以自动判断数据类型，省去了大段代码。
+
+\subsubsection{静态导入}
+
+有一种 \texttt{import} 语句允许导入静态方法和静态字段，而不只是类。
+
+比如，在源文件顶部，添加一条指令:
+\begin{Java}
+import static java.lang.System.*;
+out.println("Goodbye");
+\end{Java}
+
+另外，还可以导入特定的方法或字段:
+\begin{Java}
+import static java.lang.System.out;
+\end{Java}
+
+\subsubsection{类路径}
+
+类路径是所有包含类文件的路径的集合。
+在 UNIX 环境中，类路径用 : 分隔，在 Windows 环境中，则以 ; 分隔。
+
+设置类路径可以使用 -classpath 选项，也可以通过设置 CLASSPATH 环境变量来指定。
+
+\begin{Java}
+java -classpath c:\classdir;,;c:\archives\archive.jar MyProg
+set CLASSPATH = c:\classdir;.;c:\archives\archive.jar
+\end{Java}
+
+直到推出 shell 为止，类路径设置均有效。
+
+\subsection{JAR 文件}
+
+Java 归档文件(JAR) 文件既可以包含类文件，也可以包含诸如图像和声音等其他类型的文件。此外，JAR 文件是压缩的，它使用了我们熟悉的 ZIP 压缩格式。
+
+\subsubsection{创建 JAR 文件}
+
+通常，jar 命令的格式如下:
+\begin{Java}
+jar options file1 file2 ...
+\end{Java}
+
+其中 options 包含的可选项如下:
+
+\begin{table}[H]
+    \centering
+    \caption{jar 程序选项}
+    \label{table:jar 程序选项}
+    \setlength{\tabcolsep}{10mm}
+    \begin{tabular}{c|ccc}
+        \toprule
+        \textbf{选项} & \textbf{说明} \\
+        \midrule
+        c & 创建一个新的或空的存档文件并加入文件。 \\
+        C & 临时改变目录。 \\
+        e & 在清单文件中创建一个入口点。 \\
+        f & 指定 JAR 文件名作为第二个命令行参数。 \\
+        i & 建立索引文件 \\
+        m & 将一个清单文件添加到 JAR 文件中 \\
+        M & 不为条目创建清单 \\
+        t & 显示内容表 \\
+        u & 更新一个已有的 JAR 文件 \\
+        v & 生成详细的输出结果 \\
+        x & 解压文件 \\
+        0 & 存储但不进行 ZIP 压缩 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsubsection{清单文件}
+
+清单文件用于描述归档文件的特殊特性。清单文件被命名为 MANIFEST.MF，它位于 JAR 文件的一个特殊的 META-INF 子目录中。
+
+复杂的清单文件可能包含更多条目。这些清单条目被分成多个节。第一节被称为主节。他作用于整个 JAR 文件。随后的条目用来指定命名实体的属性，如单个文件，包或URL。它们必须以一个 Name 条目开始。节于节之间用空行分开。例如:
+
+\begin{Java}
+Manifest-Version: 1.0
+lines describing this archive
+
+Name:Woozle.class
+lines describing this class
+Name:com.mycompany.mypkg/
+lines describing this package
+
+\end{Java}
+
+要想编辑清单文件，需要将希望添加到清单文件中的行放到文本文件中，然后运行:
+\begin{Java}
+jar cfm jarFileName mainfestFileName...
+\end{Java}
+
+要想更新一个已有的 JAR 文件的清单，则需要将添加的部分放置到一个文本文件中，然后执行以下命令:
+
+\begin{Java}
+jar ufm MyArchive.jar manifest-additions.mf
+\end{Java}
+
+此外，清单文件的最后一行必须是一个换行符，否则将无法被正确读取。
+
+\subsubsection{可执行 JAR 文件}
+
+可以使用 jar 命令中的 e 选项指定程序的入口点:
+
+\begin{Java}
+jar cvfe MyProgram.jar com.mycompany.mypkg.MainAppClass files to add
+\end{Java}
+
+或者在清单文件中指定程序的主类:
+\begin{Java}
+Main-Class: com.mycompany.mypkg.MainAppClass
+\end{Java}
+
+无论使用哪一种方法，用户可以简单地通过下面的命令来启动程序:
+\begin{Java}
+java -jar MyProgram.jar
+\end{Java}
+
+在 Mac OS 平台中，可以直接通过双击 jar 文件执行程序，但在 Windows 平台中，Java 运行时安装程序将为 ".jar" 扩展名创建一个文件关联，会用 javaw -jar 命令启动文件。当然也可以通过第三方包安装工具将 jar 文件转换为 exe 文件执行。
+
+\subsection{文档注释}
+
+JDK 包含一个很有用的工具，叫做 javadoc，它可以由源文件生成一个 HTML 文档。这些文档的内容源于我们在程序中写的注释。
+
+由于最终生成的是 HTML 文件，因此我们在注解中可以加入 html 标签。除了普通的文本，我们还可以写入自由格式文本，标记以 @ 开始，如 @author。下面将重点介绍这些自由格式文本。
+
+\subsubsection{通用注释}
+
+通用注释含有的标记如下:
+\begin{itemize}
+    \item \texttt{@since text}
+    
+    始于条目，文本可一世引入这个特性的版本的任何描述。
+
+    \item \texttt{@author name}
+    
+    作者条目，每个作者条目对应一个人名，可以有多个作者条目
+
+    \item \texttt{@version text}
+    
+    版本条目
+\end{itemize}
+
+\subsubsection{方法注释}
+
+方法中特有的标记如下:
+\begin{itemize}
+    \item \texttt{@param variable description}
+    
+    用于描述参数。
+    \item \texttt{@return description}
+    
+    用于描述返回值。
+
+    \item \texttt{@throws class description}
+    
+    用于描述可能抛出的异常。
+\end{itemize}
+
+\subsubsection{包注释}
+
+要产生包注释，就需要在每一个包目录中添加一个单独的文件。可以有如下两个选择:
+\begin{itemize}
+    \item 提供一个名为 package-info.java 的文件，在里面使用 /** */ 文档注释，后面是一个 package 语句。它不能包含更多的代码或注释。
+    \item 提供一个名为 package.html 的文件。会抽取 body 标签内的所有文本。
+\end{itemize}
+
+\subsubsection{注释抽取}
+
+如果需要要获取 javadoc 文件，则只需执行对应的 javadoc 指令即可。
+
+\newpage

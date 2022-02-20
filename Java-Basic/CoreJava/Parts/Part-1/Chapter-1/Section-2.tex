@@ -1,0 +1,254 @@
+\section{Java 基本程序设计结构}
+\subsection{Java 程序与注释}
+\subsubsection{Java 程序}
+
+一个 Java 源文件的文件名必须和此文件中的公有类\footnote{这也代表着一个 Java 程序中只能由一个类提供对外接口。}名相同，我们可以使用
+\begin{Java}
+java sample arg
+\end{Java}
+运行对应的java程序，注意不需要添加后缀名。其中 args 代表传入的参数。
+
+\subsubsection{Java 注释}
+
+Java 提供了三种注释方式：
+\begin{itemize}
+    \item 单行注释: //
+    \item 界定注释: /* \quad */
+    \item 多行注释: /** \quad */
+\end{itemize}
+在多行注释中可以通过 @ + 关键字 书写文档，比如 @author Pionpill 表示这段代码由 Pionpill 书写。要养成良好的注释习惯捏。
+
+\subsection{数值型}
+\subsubsection{Java 的一些性质}
+
+不同于 C++，Java 数字的值不会因平台不同而有变动，也即与机器硬件无关。在 A 机器上存储的整型 X 在 B 机器上也一定会是 X，C++ 在这个过程中可能会将 X 变为某个不知道的值。
+
+Java 的所有函数传参都是传值，而不是传引用。我在 Python 和 JavaScript 笔记中已经多次说明过这两者的区别，相信有经验的 coder 知道这点有多重要。
+
+Java 中除了基本类型(数值，字符串，布尔值)不是对象，其他数据类型均为对象。
+
+\subsubsection{数值的基本数据类型}
+
+下面简单过一下 Java 的基础数据类型。
+
+\noindent 整型：Java 提供了以下四种整型数:
+
+\begin{table}[H]
+    \centering
+    \caption{Java 整型}
+    \label{table:Java 整型}
+    \setlength{\tabcolsep}{10mm}
+    \begin{tabular}{c|c|cc}
+        \toprule
+        \textbf{类型} & \textbf{存储空间} & \textbf{取值范围} \\
+        \midrule
+        int & 4 byte & -20亿 —— 20 亿 \\
+        short & 2 byte & -32768 —— 32767 \\
+        long & 8 byte & $-9^{19} \text{——} 9^{19}$ \\
+        byte & 1 byte & -128 —— 127 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+有以下注意点:
+\begin{itemize}
+    \item Java 没有 unsigned 形式的整型数。
+    \item 可以给数字字面量加下划线，编译器会自动去除，这只是为了添加可读性。
+    \item 可以通过在字面量后加 l/L 指定长整型。
+\end{itemize}
+
+\noindent 浮点数：Java 提供了两种浮点类型:
+
+\begin{table}[H]
+    \centering
+    \caption{浮点类型}
+    \label{table:浮点类型}
+    \setlength{\tabcolsep}{12mm}
+    \begin{tabular}{c|c|cc}
+        \toprule
+        \textbf{类型} & \textbf{存储空间} & \textbf{有效位} \\
+        \midrule
+        float & 4 byte & 6-7 位 \\
+        double & 8 byte & 15 位 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+有以下注意点:
+\begin{itemize}
+    \item 三个特殊浮点数值: 正无穷大，负无穷大，NAN。
+    \item 可以通过在字面量后加 f/F d/D 指定浮点数类型。
+\end{itemize}
+
+\noindent 布尔型(boolean)
+
+注意Java 中的 boolean 型不是整型就行了\footnote{Python 中布尔值就是 0/1。}。
+
+\subsubsection{数值转换}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[font=\small]
+        \node [draw] (byte) at (0,0) {byte};
+        \node [draw] (short) at (3,0) {short};
+        \node [draw] (int) at (6,0) {int};
+        \node [draw] (long) at (9,0) {long};
+        \node [draw] (char) at (6,2) {char};
+        \node [draw] (float) at (6,-2) {float};
+        \node [draw] (double) at (9,-2) {double};
+        \draw [-Stealth] (byte) -- (short); 
+        \draw [-Stealth] (short) -- (int); 
+        \draw [-Stealth] (char) -- (int); 
+        \draw [-Stealth] (int) -- (long); 
+        \draw [-Stealth] (int) -- (double);
+        \draw [-Stealth] (float) -- (double);
+        \draw [-Stealth,dashed] (int) -- (float);
+        \draw [-Stealth,dashed] (long) -- (double);
+        \draw [-Stealth,dashed] (long) -- (float);
+    \end{tikzpicture}
+    \caption{数值类型之间的合法转换}
+    \label{fig:数值类型之间的合法转换}
+\end{figure}
+
+上图所示，实线代表无信息丢失，虚线代表可能有信息丢失。此外，在进行数值计算时会自动向精度更高的数值类型转换。
+
+\subsubsection{大数}
+
+在 \texttt{java.math} 包中包含两个大数类: BigInteger 和 BigDecimal。这两个类可以处理包含任意长度数字序列的数值。
+
+\subsection{字符串}
+
+字符串基本操作和其他语言一样，下面讲一下易混淆的 equals 和 == 比较运算。
+
+\subsubsection{== 比较}
+
+对于基本数据类型，== 比较值是否相同(因为基本数据类型没有引用捏)。
+
+对于引用数据类型，== 比较引用的地址是否相同。
+
+\subsubsection{equals()}
+
+Object 中的 \texttt{equals} 方法是这样写的:
+\begin{Java}
+public boolean equals(Object obj) {
+    return (this == obj);
+}
+\end{Java}
+
+也即和 == 相同，对引用数据类型比较地址是否相同。但绝大多数类都会重写 \texttt{equals} 方法，在 string 中就这样重写了 \texttt{equals} 方法:
+
+\begin{Java}
+public boolean equals(Object anObject) {
+    if (this == anObject) {
+        return true;
+    }
+    if (anObject instanceof String) {
+        String anotherString = (String)anObject;
+        int n = value.length;
+        if (n == anotherString.value.length) {
+            char v1[] = value;
+            char v2[] = anotherString.value;
+            int i = 0;
+            while (n-- != 0) {
+                if (v1[i] != v2[i])
+                    return false;
+                i++;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+\end{Java}
+
+可以理解为: 比较内容是否相同。
+
+\subsection{输入与输出}
+
+\subsubsection{标准输入}
+
+利用 Java 进行标准输出非常简单，调用 \texttt{System.out.print()} 即可，而构建标准输入却显得不那么简单。想要通过控制台进行输入，往往需要执行以下几个步骤:
+
+\begin{itemize}
+    \item 构建 \texttt{Scanner} 对象:
+\begin{Java}
+Scanner in = new Scanner(System.in);
+\end{Java}
+
+    \item 调用对应的方法:
+    
+    Scanner 对象针对不同的数据类型设计了多种方法，例如最简单的 \texttt{nextLine()} 读取一行输入， \texttt{next()} 读取一个单词，\texttt{nextInt()} 读取一个整数。
+\end{itemize}
+
+同时针对读取密码，Java 还设计了 \texttt{Console} 类，但它不如 \texttt{Scanner} 那么好用。
+
+\subsubsection{文件的输入输出}
+
+文件的读取同样需要构建 Scanner 对象:
+
+\begin{Java}
+Scanner in = new Scanner(Path.of("myfile.txt"),StandardCharsets.UTF_8);
+\end{Java}
+
+文件写入则需要构造 PrintWriter 对象。
+
+\begin{Java}
+PrintWriter out = new PrintWriter("myfile.txt",StandardCharsets.UTF_8);
+\end{Java}
+
+在这个过程中可能会因为文件不存在或无法在指定路径创建文件等 IO 错误。
+
+\subsection{数组}
+\subsubsection{数组基础}
+
+数组与字符串一样是不可变数据类型。其基础的创建语句如下(其中数字代表数组长度):
+
+\begin{Java}
+int[] a = new int[100];
+\end{Java}
+
+Java 提供了一种创建数组的简写形式:
+
+\begin{Java}
+int[] a = {1,2,3,4,5};
+\end{Java}
+
+也可以通过这种方式创建匿名数组:
+
+\begin{Java}
+new int[] {1,2,3,4,5};
+\end{Java}
+
+多维数组的申明也十分简单:
+\begin{Java}
+double[][] a = new double[m][n];
+\end{Java}
+
+\subsubsection{for each 循环}
+
+Java 提供了一种遍历可迭代对象的简单语法:
+\begin{Java}
+for(int element:a)
+    System.out.println(element);
+\end{Java}
+
+这和传统的 \texttt{for} 循环结合下标达到的效果是相同的。
+
+\subsubsection{数组拷贝}
+
+由于 Java 的所有参数传递都是值传递，直接使用下面这种形式拷贝数组仅是一种浅拷贝。
+
+\begin{Java}
+int[] a = {1,2,3};
+int[] b = a;
+\end{Java}
+
+如果想要深拷贝数组，则需要使用到 \texttt{Arrays} 类的 \texttt{copyOf} 方法。
+
+\begin{Java}
+int[] b = Arrays.copyOf(luckyNumbers, 2*luckyNumbers.length);
+\end{Java}
+
+其中，第二个参数是数组长度。
+
+\newpage

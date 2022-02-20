@@ -1,0 +1,343 @@
+\section{继承}
+\subsection{类继承基础}
+
+\subsubsection{多态与强制类型转换}
+
+多态: 程序中定义的引用变量所指向的具体类型和通过该引用变量发出的方法调用在编程时并不确定，而是在程序运行期间才确定，即一个引用变量倒底会指向哪个类的实例对象，该引用变量发出的方法调用到底是哪个类中实现的方法，必须在由程序运行期间才能决定。
+
+在实践中，多态表现为超类可以引用子类对象:
+\begin{Java}
+Person a = new Employee("Pionpill");
+Person b = new Admin("Brandon");
+Person c = new Staff("Chicken");
+\end{Java}
+
+不能将超类的引用赋予给子类变量。如何判断多态，可以使用 ``is-a'' 规则。
+
+此外，多态引用的对象仅能使用超类的方法，而不能使用子类的方法。例如上面 Person 对象 a 只能使用 Person 的方法，如果调用 Employee 独有的方法则会报错。
+
+有时候可能需要将某个类的对象引用转换成另一个类的对象引用。进行强制类型转换的唯一原因是: 要在暂时忽视对象的实际类型之后使用对象的全部功能。
+
+\begin{Java}
+Manager boss = (Manager) staff;
+\end{Java}
+
+一般情况下，我们只会在继承层次内进行强制类型转换。并且在将超类转换为子类之前，使用 \texttt{instanceof} 进行检查。
+
+\begin{Java}
+if (staff instanceof Manager) {
+    boss = (Manager) staff;
+}
+\end{Java}
+
+虽然极少数情况下会用到强制类型转换，但并不推荐这样使用，如果一定要使用的话，建议先考虑重新设计继承树。
+
+\subsubsection{抽象类}
+
+假设有抽象基类 Person 的两个子类 Employee 和 Student。抽象基类的所有方法均为抽象方法，两个子类均实现了父类的全部抽象方法。
+
+众所周知，抽象类无法创建实例，但是可以定义一个抽象类的对象变量，这个变量只能引用非抽象子类的对象:
+\begin{Java}
+Person a = new Employee("Pionpill");
+\end{Java}
+
+下面代码是可行的:
+\begin{Java}
+var people = new Person[2];
+people[0] = new Employee(...);
+people[1] = new Student(...);
+for (Person p : people)
+    System.out.println(p.getName() + "," + p.getDescription());
+\end{Java}
+
+我们知道，抽象基类的方法是没有定义的，因此也不可能被调用。但由于不能构造抽象类 Person 的对象，所以变量 p 永远不会引用 Person 对象，而是引用其子类(具体的对象)，而这些对象中都实现了对应的方法。
+
+与此同时，如果省略抽象基类的方法，仅在子类中实现诸如 getDescription() 方法，就不能在变量 p 上调用对应方法了，这是因为编译器只允许调用在类中声明的方法。
+
+\subsection{所有子类的超类: Object}
+
+当我们定义一个类时如果没有明确地指出它的超类，那么它的直接超类就是 Object 类。同时 Object 是除基本类型外所有类的最顶层超类。
+
+\subsubsection{Object 类型的变量}
+
+Object 类型的变量可以引用任何类型的对象。
+
+\begin{Java}
+Object obj = new Employee("Harry Hacker", 35000);
+\end{Java}
+
+当然，Object 类型的变量只能用于作为各种值的一个泛型容器。要想对其中的内容进行具体的操作，还需要清楚对象的原始类型，并进行强制类型转换。
+
+\begin{Java}
+Employee e = (Employee) obj;
+\end{Java}
+
+\subsubsection{\texttt{equals} 方法}
+
+前文已经提及过 \texttt{equals} 方法，这里主要说明一些实现细节。
+
+Java 语言规范要求 \texttt{equals} 方法具有下面的特征:
+\begin{itemize}
+    \item \textit{自反性}: 任何非空引用，\texttt{x.equals(x)} 应该返回 true。
+    \item \textit{对称性}: 任何非空引用，当且仅当 \texttt{x.equals(y)} 返回 true 时， \texttt{y.equals(x)} 返回 true。 
+    \item \textit{传递性性}: 任何三个非空引用，两两相等，那么三个引用应相等。
+    \item \textit{一致性}: 任何非空引用，反符调用 \texttt{equals} 函数应返回相同的值。
+    \item 任意非空引用，与 null 比较时，都应返回 false。
+\end{itemize}
+
+在实际实现 \texttt{equals} 方法的过程中，往往不可避免的使用到 \texttt{instanceof}，\texttt{getClass} 等操作，但是这些操作往往会违反上述的某些特性，即使是官方库的有些实现也陷入了这样的窘境。
+
+对于上述问题，原书给出了如下建议:
+\begin{enumerate}
+    \item 显示参数名为 otherObject。
+    \item 检查 this 和 otherObject 是否相等:
+\begin{Java}
+if (this == otherObject) return true;
+\end{Java}
+    这条语句只是一个优化，因为检查身份要比逐个比较字段开销小。
+    \item 检查 otherObject 是否为 null，如果是，则返回 false。
+\begin{Java}
+if(otherObject == null) return false;
+\end{Java}
+    \item 比较类，如果 \texttt{equals} 的语义可以在子类中改变，就使用 getClass 检测。
+\begin{Java}
+if(getClass() != otherObject.getClass()) return false;
+\end{Java}
+
+如果所有子类都有相同的相等性语义，可以使用 \texttt{instanceof} 检测:
+\begin{Java}
+if(!(otherObject instanceof ClassName)) return false;
+\end{Java}
+
+\item 将 otherObject 强制转换为相应类类型的变量：
+\begin{Java}
+CLassName other = (ClassName) otherObject;
+\end{Java}
+
+\item 根据相等性概念的要求来比较字段。使用 == 比较基本类型的字段，使用 Object.equals 比较对象字段。
+\end{enumerate}
+
+\subsubsection{\texttt{hashCode} 方法}
+
+散列码是由对象导出的一个整型值。散列码是没有规律的，两个不同对象的散列码基本上不会相同。在 Object 类中定义了 \texttt{hashCode} 方法用于生成散列码。
+
+下面是 String 类计算散列码的方法:
+\begin{Java}
+int hash = 0;
+for(int i=0; i<length(); i++)
+    hash = 31*hash + charAt(i);
+\end{Java}
+
+在实现类的 \texttt{hashCode} 方法时，常常组合类中各个属性的散列码计算出实例的散列码。几乎所有的对象以及基本类型都有 \texttt{hashCode} 方法。 部分对象和基本类型有静态 \texttt{hashCode} 方法。
+
+\begin{Java}
+public int hashCode() {
+    return 7 * name.hashCode() + 11 * Double.hashCode(salary) + 13 * hireDay.hashCode();
+}
+\end{Java}
+
+还有个更好的做法，直接调用 \texttt{Objects.hash} 计算散列值:
+\begin{Java}
+public int hashCode() {
+    return Objects.hash(name, salary, hireDay);
+}
+\end{Java}
+
+\subsubsection{\texttt{toString} 方法}
+
+\texttt{toString} 方法返回表示对象值的一个字符串。绝大多数的返回值遵循这样的格式: 类名 + [字段]。比如下面这个例子:
+\begin{Java}
+public String toString() {
+    return getClass().getName() + "[name=" + name + ",salary=" + salary + "]";
+}
+\end{Java}
+
+设计子类的程序员应该定义自己的 \texttt{toString} 方法。如果超类已经实现了 \texttt{toString} 方法，则子类只需要调用 \texttt{super.toString()} 就可以了。
+\begin{Java}
+public String toString() {
+    return super.toString() + "[bonus" + bonus + "]";
+}
+\end{Java}
+
+\texttt{toString} 方法随处可见的主要原因如下:
+\begin{itemize}
+    \item 在字符串的 ``+'' 操作中连接对象，编译器将自动调用对象的 \texttt{toString} 方法。
+\begin{Java}
+var p = new Point(10,20);
+String message = "The current point is " + p;
+\end{Java}
+    \item \texttt{println()} 函数的参数如果是对象，则会自动调用对应的 \texttt{toString} 方法。
+\begin{Java}
+System.out.println(x);
+\end{Java}
+\end{itemize}
+
+\fbox{
+    \parbox{0.87\textwidth}{
+        \begin{warning}
+            数组继承了 Object 类的 \texttt{toString} 方法，数字类型将使用一种古老的格式([I...)打印。补救的方法是调用静态方法 \texttt{Arrays.toString}。如果是多维数组，则需要调用 \texttt{Arrays.deepToString} 方法。
+        \end{warning}
+    }
+}
+
+在实际项目中，强烈建议给自己定义的每一个类添加 \texttt{toString} 方法。
+
+\subsection{泛型数组列表}
+
+如果有 C++ 编程经历，一定会因为数组大小不可变而苦恼。即使 Java 允许在运行时确定数组大小，但是并不能动态更改数组。
+
+解决这个问题的最简单方法是使用 Java 中的一个类，名为 \texttt{ArrayList}。在添加和删除元素时，它能够自动地调整数组容量。
+
+\texttt{ArrayList} 是一个有参数类型的泛型类。为了指定数组列表保存的元素对象地类型。需要用一对尖括号括起来追加到 \texttt{ArrayList} 后面。
+
+\subsubsection{声明数组列表}
+
+声明一个保存 \texttt{Employee} 对象的数组列表的三种语法(Java10):
+\begin{Java}
+ArrayList<Employee> staff = new ArrayList<Employee>();
+var staff = new ArrayList<Employee>();
+ArrayList<Employee> staff = new ArrayList<>();
+\end{Java}
+
+上面第三种声明语法叫菱形语法，虽然在第二个菱形中没有指定对象名，但编译器会检查前面的变量名自动确认对象类型。
+
+\fbox{
+    \parbox{0.87\textwidth}{
+        \begin{notice}
+            在 Java 老版本中，会使用 \texttt{Vector} 类实现动态数组。不过，\texttt{ArrayList} 类更加高效，已经没有任何理由再使用 \texttt{Vector}。
+        \end{notice}
+    }
+}
+
+下面介绍几个常用的方法:
+\begin{itemize}
+    \item \texttt{ArrayList<E>(int initialCapacity)} 
+    
+    用指定容量构造一个空数组列表。
+    \item \texttt{boolean add(E obj)}
+    
+    将元素添加到数组列表中。数组列表管理着一个内部的对象引用数组。
+    \item \texttt{int size()}
+    
+    返回当前存储在数组列表中的元素个数。
+    \item \texttt{void ensureCapacity(int capacity)}
+    
+    确定数组列表容量。
+    \item \texttt{void trimToSize()}
+    
+    将数组列表的存储容量削减到当前大小。
+\end{itemize}
+
+\subsubsection{访问数组列表元素}
+
+数组列表自动扩展容量的便利增加了访问元素语法的复杂程度。其原因是 \texttt{ArrayList} 类并不是 Java 程序设计语言的一部分，而是某个人编写并在标准库中提供的一个实用工具类。
+\begin{itemize}
+    \item \texttt{E set(int index, E obj)}
+    
+    将值 obj 放置在数组列表的指定索引位置，返回之前的内容。
+    \item \texttt{E get(int index)}
+    
+    得到指定索引位置存储的值。
+    \item \texttt{void add(int index, E obj)}
+    
+    后移元素从而将 obj 插入到指定索引位置。
+    \item \texttt{E remove(int index)}
+    
+    删除指定索引位置的元素，并将后面的元素前移。返回所删除的元素。
+\end{itemize}
+
+\subsection{对象包装器与自动装箱}
+
+有时候需要将 \texttt{int} 这样的基本类型转换为对象。所有的基本类型都有一个与之对应的类，这些类通常被称为包装器: \texttt{Integer, Long, Float, Double, Short, Byte, Character, Boolean}。包装类是不可变的，也是 \texttt{final} 类，因此不能派生它们的子类。
+
+假定要定义一个整型数组列表。尖括号中不允许是基本类型，就只能用到 \texttt{Integer} 包装器类。
+\begin{Java}
+var list = new ArrayList<Integer>();
+\end{Java}
+
+幸运的是，\texttt{ArrayList} 提供了自动装箱与自动拆箱操作。使得我们可以直接这样使用:
+\begin{Java}
+list.add(3);            // 自动转换为: list.add(Integer.valueOf(3));
+int n = list.get(i);    // 自动转换为: list.get(i).intValue();
+\end{Java}
+
+自动装箱与自动拆箱适用于许多地方，这使得基本类型和它们的对象包装看起来是一样的。但它们有一个很大的不同: 同一性。\texttt{==} 运算符在基本类型中比较的是值是否相同，而在包装器对象中则是比较内存位置是否相同。因此，下面比较通常会失败。
+\begin{Java}
+Integer a = 1000;
+Integer b = 1000;
+a == b;     // false
+\end{Java}
+
+不过上述比较结果也不往往是 false，如果经常出现的值包装到相同的对象中，这种比较就可能成功。这种不确定的结果并不是我们想要的，解决的办法是在比较两个包装器对象时调用 \texttt{equals} 方法。
+
+由于包装器类引用可以为 \texttt{null}。所以自动装箱有可能会抛出一个 \texttt{NullPointerException} 异常。
+
+\subsection{参数数量可变的方法}
+
+我们知道，\texttt{print} 函数的参数个数没有限制。它是这样定义的:
+\begin{Java}
+public PrintStream printf(String fmt, Object... args) {
+    return format(fmt, args);
+}
+\end{Java}
+
+这里的省略号 ... 是 Java 代码的一部分，它表明这个方法可以接收任意数量的对象。世界上 \texttt{print} 方法接收两个参数，一个是格式字符串，另一个是 \texttt{Object[]} 数组，其中保存着所有其他参数(如果调用者提供的是基本类型，会自动将它们装箱为对象)。
+
+换句话说，对于\texttt{printf}的实现者来说，\texttt{Object...}参数类型与 \texttt{Object[]}完全一样。编译器会自动转换每个 \texttt{print} 调用，将参数绑定到数组中，并在必要的时候进行自动装箱。
+
+下面是一个计算若干个数值中最大值的函数:
+\begin{Java}
+public static double max(double... values) {
+    double largest = Double.NEGATIVE_INFINITY;
+    for(double v:values)
+        if (v>largest)
+            largest = v;
+    return largest;
+}
+double m = max(4.1, 40, -5);
+\end{Java}
+
+编译器将 \texttt{new double[] \{4.1, 40, -5\}} 传递给 \texttt{max} 方法。
+
+\subsection{枚举类}
+
+下面举一个例子:
+\begin{Java}
+public enum Size {SMALL, MEDIUM, LARGE, EXTRA_LARGE}
+\end{Java}
+实际上，这个声明定义的类型是一个类，它刚好有 4 个实例，不可能构造新的对象。因此在比较枚举类型的值时，并不需要调用 \texttt{equals}，直接使用 ``=='' 就可以了。
+
+如果需要的话，可以为枚举类型增加构造器，方法和字段。当然，构造器只是在构造枚举常量的时候调用。下面是一个示例:
+\begin{Java}
+public enum Size {
+    SMALL("S"), MEDIUM("M"), LARGE("L"), EXTRA_LARGE("XL");
+    private String abbreviation
+    private Size(String abbreviation) {this.abbreviation = abbreviation;}
+    public String getAbbreviation() {return abbreviation;}
+}
+\end{Java}
+
+枚举的构造器必须是私有的，可以省略 \texttt{private} 修饰符。所有枚举类型都是 \texttt{Enum} 类的子类。它们继承了这个类的许多方法。其中最有用的一个是 \texttt{toString}, 这个方法会返回枚举常量名。\texttt{toString} 的逆方法是静态方法 \texttt{ValueOf}:
+\begin{Java}
+Size s = Enum.valueOf(Size.class, "SMALL");
+\end{Java}
+
+此外还有几个常用的方法:
+\begin{itemize}
+    \item \texttt{int ordinal()}
+    
+    返回枚举常量在 \texttt{enum} 声明中的位置，位置从 0 开始计数。
+    \item \texttt{int compareTo(E other)}
+    
+    和字符比较相同，返回负整数，0，正整数。
+\end{itemize}
+
+\subsection{反射}
+
+反射库提供了一个丰富且精巧的工具集，可以用来编写能够动态操作 Java 代码的程序。能够分析类能力的程序成为反射。反射机制的功能极其强大。
+
+反射是一种功能强大且复杂的机制。主要是开发工具的程序员对它感兴趣，一般应用程序员并不需要考虑反射机制。如果你不需要为其他 Java 程序员构建工具，可以跳过本章剩余部分。
+
+跳过。
+
+\newpage
